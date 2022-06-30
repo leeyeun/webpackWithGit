@@ -1,8 +1,12 @@
 const path = require("path");
 const webpack = require("webpack");
+const childProcess = require("child_process");
+
+const dotenv = require("dotenv");
+dotenv.config();
 
 module.exports = {
-    mode: "development",
+    mode: "production",
     entry: {
         main: path.resolve("./src/app.js"),
     },
@@ -34,8 +38,17 @@ module.exports = {
     },
     plugins: [
         new webpack.BannerPlugin({
-            banner:
-                "마지막 빌드 시간은 " + new Date().toLocaleString() + "입니다.",
+            banner: `Commit version: ${childProcess.execSync(
+                "git rev-parse --short HEAD"
+            )}
+                Committer name : ${childProcess.execSync(
+                    "git config user.name"
+                )}
+                commit Date : ${new Date().toLocaleString()}`,
+        }),
+        new webpack.DefinePlugin({
+            dev: JSON.stringify(process.env.DEV_API),
+            pro: JSON.stringify(process.env.PRO_API),
         }),
     ],
 };
